@@ -1,5 +1,5 @@
 import path from 'path'
-import { Observable } from 'rxjs'
+import { filter, first, map, Observable, take } from 'rxjs'
 import fs from 'fs'
 
 const filePaths: string[] = [
@@ -60,7 +60,31 @@ let obs = lerArquivos(filePaths)
 // 2° Erro
 // 3° Completo
 
-obs.subscribe(
+
+
+
+
+
+obs
+.pipe(
+  // map((texto) => {
+  //   return texto.split(' ')[0]
+  // }),
+  // map((tamPalavra) => {
+  //   return tamPalavra.length
+  // })
+  // filter((tipoArq) => {
+  //   return isCSS.test(tipoArq)
+  // })
+  // filter((arq) => {
+  //   return isHTML.test(arq) == false && isCSS.test(arq) == false
+  // })
+  // take(4)
+  first((arq) => {
+    return isHTML.test(arq)
+  })
+)
+.subscribe(
   (conteudoLido) => {
     console.log('-------- ARQUIVO LIDO COM SUCESSO --------')
     console.log(conteudoLido)
@@ -76,8 +100,8 @@ obs.subscribe(
 )
 console.log('----------------------------------------------')
 
-obs.subscribe(
-  (conteudoLido) => {
-    console.log(`Este arquivo possui ${conteudoLido.length} caracteres`)
-  }
-)
+// obs.subscribe(
+//   (conteudoLido) => {
+//     console.log(`Este arquivo possui ${conteudoLido.length} caracteres`)
+//   }
+// )
