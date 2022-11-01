@@ -24,8 +24,14 @@ function lerArquivos(arquivos: string[]) {
   
   const leitor = new Observable<string>((subscriber) => {
     arquivos.forEach((arq) => {
-      const conteudo = fs.readFileSync(arq, { encoding: 'utf-8'})
-      subscriber.next(conteudo)// responsavel por mandar a mensagem de sucesso
+      
+      try {
+        const conteudo = fs.readFileSync(arq, { encoding: 'utf-8'})
+        subscriber.next(conteudo)
+      } catch (error) {
+        subscriber.error(`Não foi possível ler o arquivo que esta no caminho ${arq}`)
+      }
+      // responsavel por mandar a mensagem de sucesso
       //subscriber.error()//responsavel por mandar a mensagem de erro
       //subscriber.complete()//responsavel por mandar a mensagem de completo
       /**
@@ -36,17 +42,19 @@ function lerArquivos(arquivos: string[]) {
        *               e enviou os dados com sucesso
        *   
        *   -> Erro: O Observable teve algum problema durante a sua execução e não conseguiu
-       *            realizar sua tarefa de maneira satisfatória e não conseguiu enviar os dados
+       *            realizar sua tarefa de maneira satisfatória e não conseguiu enviar os dados.
        *            Quando um Observable passa pelo estágio de erro, sua execuç
        **/
 
-    }) 
+    })
+    
+    subscriber.complete()
   })
 
   return leitor
 }
 
-const obs = lerArquivos(filePaths)
+let obs = lerArquivos(filePaths)
 
 // 1° Sucesso
 // 2° Erro
@@ -57,7 +65,16 @@ obs.subscribe(
     console.log('-------- ARQUIVO LIDO COM SUCESSO --------')
     console.log(conteudoLido)
     console.log("------------------------------------------\n\n")
-})
+  },
+  (erro) => {
+    console.log('OCORREU UM ERRO NA EXECUÇÃO DO OBSERVABLE')
+    console.log(erro)
+  },
+  () => {
+    console.log('Todos os arquivos foram lidos com sucesso')
+  }
+)
+console.log('----------------------------------------------')
 
 obs.subscribe(
   (conteudoLido) => {
